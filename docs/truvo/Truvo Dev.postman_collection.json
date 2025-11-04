@@ -1,0 +1,107 @@
+{
+	"info": {
+		"_postman_id": "307b1523-ad60-4296-bf7a-65c1b1343fb0",
+		"name": "Truvo Dev",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31330846",
+		"_collection_link": "https://pi-team-5032.postman.co/workspace/PI-Workspace~b6aead79-ff5e-455a-a5ec-5b224330f794/collection/31330846-307b1523-ad60-4296-bf7a-65c1b1343fb0?action=share&source=collection_link&creator=31330846"
+	},
+	"item": [
+		{
+			"name": "AZ",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"action\": \"RATEQUOTE\",\r\n  \"username\": \"test@truvoinsurance.com\",\r\n  \"password\": \"Truvo$2025\",\r\n  \"producerCode\": \"AZ1198\",\r\n  \"transType\": \"NB\",\r\n  \"policyTerm\": \"6 Months\",\r\n  \"inceptionDate\": \"2025/11/01\",\r\n  \"effectiveDate\": \"2025/11/01\",\r\n  \"rateDate\": \"2024/11/28\",\r\n  \"holderFirstName\": \"Test4\",\r\n  \"holderMiddleInitial\": \"A\",\r\n  \"holderLastName\": \"ITC0307\",\r\n  \"address\": \"235 S 190th Ave\",\r\n  \"address2\": \"\",\r\n  \"city\": \"BUCKEYE\",\r\n  \"state\": \"AZ\",\r\n  \"zipCode\": \"85326\",\r\n  \"email\": \"Test.AZ@zywave.com\",\r\n  \"cellPhone\": \"9999999999\",\r\n  \"mailSame\": \"Y\",\r\n  \"mailAddress\": \"\",\r\n  \"mailAddress2\": \"\",\r\n  \"mailCity\": \"\",\r\n  \"mailState\": \"\",\r\n  \"mailZipCode\": \"\",\r\n  \"BI\": \"30/60\",\r\n  \"PD\": \"15\",\r\n  \"UMBI\": \"25/50\",\r\n  \"UIMBI\": \"25/50\",\r\n  \"MP\": \"500\",\r\n  \"roadsideAssistance\": \"Y\",\r\n  \"unacceptableRisk\": \"N\",\r\n  \"renewalDiscount\": \"N\",\r\n  \"advanceDiscount\": \"N\",\r\n  \"payplan\": \"EFTCC\",\r\n  \"homeownerDiscount\": \"Y\",\r\n  \"ispriorpolicy\": \"YES\",\r\n  \"priordayslapse\": \"10\",\r\n  \"priorexpirationdate\": \"2025/06/28\",\r\n  \"monthsinprior\": \"5\",\r\n  \"ispriorinsameagency\" : \"YES\",\r\n  \"vehicles\": [\r\n    {\r\n      \"year\": 2022,\r\n      \"make\": \"TOYOTA\",\r\n      \"model\": \"CAMRY\",\r\n      \"trim\": \"SE\",\r\n      \"vin\": \"4T1G11AK9NU630788\",\r\n      \"roadsideAssistance\": \"Y\",\r\n      \"SE\": \"N\",\r\n      \"TR\": \"Y\",\r\n      \"COM\": \"500\",\r\n      \"COL\": \"500\",\r\n      \"vehicleUse\": \"WRK\",\r\n      \"antitheft\": \"PAA\",\r\n      \"braking\": \"ABSS\",\r\n      \"price\": 27245.0,\r\n      \"weight\": 0,\r\n      \"drivetype\": \"2WD\",\r\n      \"ridesharing\": \"N\"\r\n    },\r\n    {\r\n      \"year\": 2022,\r\n      \"make\": \"MITSUBISHI\",\r\n      \"model\": \"MIRAGE\",\r\n      \"trim\": \"G4 BLACK EDIT\",\r\n      \"vin\": \"ML32FUFJ7N\",\r\n      \"roadsideAssistance\": \"N\",\r\n      \"SE\": \"N\",\r\n      \"TR\": \"N\",\r\n      \"COM\": \"500\",\r\n      \"COL\": \"500\",\r\n      \"vehicleUse\": \"WRK\",\r\n      \"antitheft\": \"PAA\",\r\n      \"braking\": \"ABSS\",\r\n      \"price\": 15645.0,\r\n      \"weight\": 0,\r\n      \"drivetype\": \"2WD\",\r\n      \"ridesharing\": \"Y\",\r\n      \"platestate\":\"AZ\",\r\n      \"platenumber\":\"7896541\",\r\n      \"parties\": [\r\n        {\r\n          \"partyName\": \"Bank of America (Auto)\",\r\n          \"partyType\": \"Additional Interest\",\r\n          \"address1\": \"Waffle\",\r\n          \"address2\": \"Wef\",\r\n          \"city\": \"Wef\",\r\n          \"state\": \"DE\",\r\n          \"zip\": \"12312\"\r\n        }\r\n      ]\r\n    }\r\n  ],\r\n  \"drivers\": [\r\n    {\r\n      \"firstName\": \"Test4\",\r\n      \"lastName\": \"ITC0307\",\r\n      \"dob\": \"1979/11/26\",\r\n      \"gender\": \"M\",\r\n      \"married\": \"Y\",\r\n      \"points\": 0,\r\n      \"licenseNumber\": \"A53454557\",\r\n      \"licenseState\": \"AZ\",\r\n      \"licenseStatus\": \"RVKD\",\r\n      \"employerName\": \"\",\r\n      \"occupation\": \"Electrician/Linesman\",\r\n      \"businessPhone\": \"\",\r\n      \"sr22\": \"Y\",\r\n      \"Sr22Date\":\"2022/11/11\",\r\n      \"excludeFromCoverage\": \"N\",\r\n      \"av12\": 0,\r\n      \"av24\": 0,\r\n      \"av36\": 0,\r\n      \"driverDNA\": 10,\r\n      \"violations\": []\r\n    },\r\n    {\r\n      \"firstName\": \"FeTest\",\r\n      \"lastName\": \"AZ\",\r\n      \"dob\": \"1980/11/26\",\r\n      \"gender\": \"F\",\r\n      \"married\": \"Y\",\r\n      \"points\": 0,\r\n      \"licenseNumber\": \"D55654588\",\r\n      \"licenseState\": \"AZ\",\r\n      \"licenseStatus\": \"INT\",\r\n      \"employerName\": \"\",\r\n      \"occupation\": \"Carpenter\",\r\n      \"businessPhone\": \"\",\r\n      \"sr22\": \"N\",\r\n      \"Sr22Date\":\"\",\r\n      \"excludeFromCoverage\": \"N\",\r\n      \"av12\": 0,\r\n      \"av24\": 0,\r\n      \"av36\": 0,\r\n      \"driverDNA\": 10,\r\n      \"violations\": [\r\n        {\r\n          \"date\": \"2022/11/26\",\r\n          \"code\": \"SPEED\",\r\n          \"description\": \"Speeding in a School Zone\",\r\n          \"points\": \"0\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action",
+					"protocol": "https",
+					"host": [
+						"pi-cc-dev-th",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"truvo",
+						"rate",
+						"action"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TX",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RATEQUOTE\",\r\n    \"username\": \"test@truvoinsurance.com\",\r\n    \"password\": \"Truvo$2025\",\r\n    \"producerCode\": \"TX1199\",\r\n    \"transType\": \"NB\",\r\n    \"policyTerm\": \"6 Months\",\r\n    \"inceptionDate\": \"2025/11/01\",\r\n    \"effectiveDate\": \"2025/11/01\",\r\n    \"rateDate\": \"2025/08/28\",\r\n    \"holderFirstName\": \"CCTX\",\r\n    \"holderMiddleInitial\": \"\",\r\n    \"holderLastName\": \"TXTest\",\r\n    \"address\": \"13808 Tercel Trce\",\r\n    \"address2\": \"\",\r\n    \"city\": \"MANOR\",\r\n    \"state\": \"TX\",\r\n    \"zipCode\": \"78653\",\r\n    \"email\": \"fdeliva@zywave.com\",\r\n    \"cellPhone\": \"1234567891\",\r\n    \"mailSame\": \"Y\",\r\n    \"mailAddress\": \"\",\r\n    \"mailAddress2\": \"\",\r\n    \"mailCity\": \"\",\r\n    \"mailState\": \"\",\r\n    \"mailZipCode\": \"\",\r\n    \"BI\": \"30/60\",\r\n    \"PD\": \"25\",\r\n    \"UMBI\": \"30/60\",\r\n    \"UIMBI\": \"30/60\",\r\n    \"UMPD\": \"25\",\r\n    \"MP\": \"None\",\r\n    \"PIP\": \"2500\",\r\n    \"roadsideAssistance\": \"Y\",\r\n    \"unacceptableRisk\": \"N\",\r\n    \"renewalDiscount\": \"N\",\r\n    \"advanceDiscount\": \"N\",\r\n    \"payplan\": \"EFTCC\",\r\n    \"homeownerDiscount\": \"Y\",\r\n    \"ispriorpolicy\": \"YES\",\r\n    \"priorpolicynumber\": \"\",\r\n    \"priordayslapse\": 27,\r\n    \"priorexpirationdate\": \"2025/08/01\",\r\n    \"monthsinprior\": 15,\r\n    \"priorbicoveragelimit\": \"30/60\",\r\n    \"priorpipcoveragelimit\": 30,\r\n    \"vehicles\": [\r\n        {\r\n            \"year\": 2022,\r\n            \"make\": \"TOYOTA\",\r\n            \"model\": \"CAMRY\",\r\n            \"trim\": \"NIGHT SHADE\",\r\n            \"vin\": \"4T1S11BK0N\",\r\n            \"roadsideAssistance\": \"Y\",\r\n            \"SE\": \"N\",\r\n            \"TR\": \"Y\",\r\n            \"COM\": \"1000\",\r\n            \"COL\": \"1000\",\r\n            \"vehicleUse\": \"WRK\",\r\n            \"platenumber\": \"1234567\",\r\n            \"platestate\": \"TX\",\r\n            \"antitheft\": \"PAA\",\r\n            \"braking\": \"ABSS\",\r\n            \"price\": 28785.0,\r\n            \"weight\": 0,\r\n            \"drivetype\": \"2WD\",\r\n            \"ridesharing\": \"N\",\r\n            \"vehiclepurchasedate\": \"2025/01/01\",\r\n            \"estimatemilage\": 100000,\r\n            \"ownershiplength\": \"NOREG\"\r\n        }\r\n    ],\r\n    \"drivers\": [\r\n        {\r\n            \"firstName\": \"CCTX\",\r\n            \"lastName\": \"TXTest\",\r\n            \"dob\": \"1993/04/23\",\r\n            \"gender\": \"F\",\r\n            \"married\": \"N\",\r\n            \"points\": 0,\r\n            \"licenseNumber\": \"\",\r\n            \"licenseState\": \"TX\",\r\n            \"licenseStatus\": \"DUSA\",\r\n            \"employerName\": \"\",\r\n            \"occupation\": \"Other\",\r\n            \"businessPhone\": \"\",\r\n            \"sr22\": \"N\",\r\n            \"excludeFromCoverage\": \"N\",\r\n            \"av12\": 0,\r\n            \"av24\": 0,\r\n            \"av36\": 0,\r\n            \"driverDNA\": 10,\r\n            \"violations\": [\r\n                {\r\n                    \"date\": \"2022/11/26\",\r\n                    \"code\": \"ADMOV\",\r\n                    \"description\": \"Driving Too Slow for Conditions\",\r\n                    \"points\": \"0\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action",
+					"protocol": "https",
+					"host": [
+						"pi-cc-dev-th",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"truvo",
+						"rate",
+						"action"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TX No-Owner",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"action\": \"RATEQUOTE\",\r\n    \"username\": \"test@truvoinsurance.com\",\r\n    \"password\": \"Truvo$2025\",\r\n    \"producerCode\": \"TX1199\",\r\n    \"transType\": \"NB\",\r\n    \"policyTerm\": \"6 Months\",\r\n    \"inceptionDate\": \"2025/11/01\",\r\n    \"effectiveDate\": \"2025/11/01\",\r\n    \"rateDate\": \"2025/08/28\",\r\n    \"holderFirstName\": \"CCTX\",\r\n    \"holderMiddleInitial\": \"\",\r\n    \"holderLastName\": \"TXTest\",\r\n    \"address\": \"13808 Tercel Trce\",\r\n    \"address2\": \"\",\r\n    \"city\": \"MANOR\",\r\n    \"state\": \"TX\",\r\n    \"zipCode\": \"78653\",\r\n    \"email\": \"fdeliva@zywave.com\",\r\n    \"cellPhone\": \"1234567891\",\r\n    \"mailSame\": \"Y\",\r\n    \"mailAddress\": \"\",\r\n    \"mailAddress2\": \"\",\r\n    \"mailCity\": \"\",\r\n    \"mailState\": \"\",\r\n    \"mailZipCode\": \"\",\r\n    \"BI\": \"30/60\",\r\n    \"PD\": \"25\",\r\n    \"UMBI\": \"30/60\",\r\n    \"UIMBI\": \"30/60\",\r\n    \"UMPD\": \"25\",\r\n    \"MP\": \"None\",\r\n    \"PIP\": \"2500\",\r\n    \"unacceptableRisk\": \"N\",\r\n    \"renewalDiscount\": \"N\",\r\n    \"advanceDiscount\": \"N\",\r\n    \"payplan\": \"EFTCC\",\r\n    \"homeownerDiscount\": \"Y\",\r\n    \"ispriorpolicy\": \"YES\",\r\n    \"priorpolicynumber\": \"\",\r\n    \"priordayslapse\": 27,\r\n    \"priorexpirationdate\": \"2025/08/01\",\r\n    \"monthsinprior\": 15,\r\n    \"priorbicoveragelimit\": \"30/60\",\r\n    \"priorpipcoveragelimit\": 30,\r\n    \"IsNonOwner\":\"Y\",\r\n    \"drivers\": [\r\n        {\r\n            \"firstName\": \"CCTX\",\r\n            \"lastName\": \"TXTest\",\r\n            \"dob\": \"1993/04/23\",\r\n            \"gender\": \"F\",\r\n            \"married\": \"N\",\r\n            \"points\": 0,\r\n            \"licenseNumber\": \"\",\r\n            \"licenseState\": \"TX\",\r\n            \"licenseStatus\": \"DUSA\",\r\n            \"employerName\": \"\",\r\n            \"occupation\": \"Other\",\r\n            \"businessPhone\": \"\",\r\n            \"sr22\": \"N\",\r\n            \"excludeFromCoverage\": \"N\",\r\n            \"av12\": 0,\r\n            \"av24\": 0,\r\n            \"av36\": 0,\r\n            \"driverDNA\": 10,\r\n            \"violations\": [\r\n                {\r\n                    \"date\": \"2022/11/26\",\r\n                    \"code\": \"ADMOV\",\r\n                    \"description\": \"Driving Too Slow for Conditions\",\r\n                    \"points\": \"0\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action",
+					"protocol": "https",
+					"host": [
+						"pi-cc-dev-th",
+						"azurewebsites",
+						"net"
+					],
+					"path": [
+						"api",
+						"truvo",
+						"rate",
+						"action"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

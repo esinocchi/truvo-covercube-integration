@@ -1,0 +1,208 @@
+---
+alwaysApply: true
+---
+# 🧩 Project Context — Truvo Covercube Integration
+
+## Overview
+
+This project implements a **backend-only Next.js (TypeScript)** integration with the **Covercube Rate Quote API**.  
+It is a **take-home assessment** meant to demonstrate backend architecture, API design, and data transformation skills.
+
+The goal is to replicate how **Truvo Insurance's** internal system communicates with Covercube to pull rate-quote data for auto-insurance policies.  
+No front end or UI is required — this project focuses solely on the API layer.
+
+---
+
+## Objective
+
+Implement a **single backend endpoint** (`/api/quote`) that:
+
+1. Receives input representing a quote request (for example, state, driver, and vehicle data).
+2. Constructs a valid Covercube payload using the structure defined in the provided Postman collection.
+3. Sends that payload to the Covercube endpoint:
+   ```
+   POST https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action
+   ```
+4. Handles and parses the response (for now, mock or log output if credentials are unavailable).
+
+---
+
+## Key Files and Structure
+
+Planned structure (may evolve slightly as the project grows):
+
+```
+src/
+ ├── app/
+ │    └── api/
+ │         └── quote/
+ │              └── route.ts         # Main API route handler (Next.js App Router)
+ ├── lib/
+ │    ├── buildRequest.ts            # Builds Covercube request body
+ │    ├── covercubeClient.ts         # Sends POST to Covercube
+ │    ├── parseResponse.ts           # Parses and validates response
+ │    └── constants.ts               # Fixed mappings (producer codes, etc.)
+ ├── types/
+ │    └── covercube.d.ts             # Type definitions for request/response shapes
+ └── utils/
+      └── validateInput.ts           # Input validation logic
+```
+
+- All runtime logic lives under `src/`.
+- The `app/api/quote/route.ts` file is the primary entry point for incoming HTTP requests.
+- `lib/` and `utils/` hold reusable, framework-agnostic logic.
+
+---
+
+## Data Sources
+
+### Postman Collection
+
+**Location** (in this repo, planned):
+```
+docs/truvo/Truvo Dev.postman_collection.json
+```
+
+This collection contains three example requests showing how Truvo's backend sends data to Covercube:
+
+- **"AZ"** — Arizona full-policy example
+- **"TX"** — Texas full-policy example
+- **"TX No-Owner"** — Texas non-owner policy example
+
+Each item defines:
+- **Method**: `POST`
+- **URL**: `https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action`
+- **Request body**: full JSON payload to Covercube (vehicles, drivers, coverages, metadata, credentials).
+- **Response**: empty array in the file (no example responses stored).
+
+These payloads are the **ground truth** for how the Covercube request body must be structured.
+
+### Covercube API Documentation
+
+**Location** (in this repo, planned):
+```
+docs/covercube/Covercube Rate Quote API Documentation.docx
+```
+
+This document describes:
+- The Covercube rate quote endpoint
+- Required and optional fields
+- Expected date formats and field meanings
+- General structure of the response (quote code, premiums, coverages, pay plans, etc.)
+
+This spec plus the Postman collection define the contract for the integration.
+
+---
+
+## Integration Flow
+
+High-level flow for the `/api/quote` endpoint:
+
+### 1. Client → Backend
+
+A caller (could be another service or a test harness) sends a `POST` request to:
+```
+/api/quote
+```
+
+with JSON including:
+- `state` (for example, `"AZ"`, `"TX"`)
+- driver data
+- vehicle data (if not a non-owner policy)
+- any other relevant policy inputs (coverage preferences, term, etc.)
+
+### 2. Backend builds Covercube payload
+
+The `buildCovercubeRequest(...)` function:
+- Validates the input (using utilities like `validateInput`).
+- Fills in all required fields (such as `action: "RATEQUOTE"`, `username`, `password`, `producerCode`, `transType`, dates).
+- Applies state-specific logic (for example, Texas non-owner policies, additional PIP or UMPD fields).
+- Produces a JSON object that matches the structure shown in the Postman collection.
+
+### 3. Backend → Covercube
+
+The `callCovercubeAPI(payload)` function:
+- Sends an HTTP `POST` to `COVERCUBE_URL` (from environment variables).
+- Uses `fetch` or a similar HTTP client.
+- Sends JSON with `Content-Type: application/json`.
+- Returns the parsed JSON response or throws an error.
+
+### 4. Backend handles the response
+
+The `parseCovercubeResponse(rawResponse)` function:
+- Validates that required fields are present (for example, `quoteCode`, total premium).
+- Optionally normalizes or simplifies the response into a cleaner shape that upstream callers can consume.
+- The `/api/quote` route returns this parsed result as JSON to the caller.
+
+If live credentials are not available, the response step can be mocked (for example, by returning a static example response stored under `docs/covercube/example-response.json` or a similar location).
+
+---
+
+## Notes and Constraints
+
+### No live credentials initially
+
+The assessment context states that real credentials are not available upfront. The code should be written so that:
+- Credentials are read from environment variables, not hardcoded.
+- The integration logic can still be tested with mocked responses.
+
+### Server-side only
+
+This project is intended to be **backend-only**:
+- No React components needed.
+- No Tailwind CSS.
+- No UI routes beyond `/api/quote`.
+
+### Separation of concerns
+
+Route handler vs. business logic:
+- `route.ts` should remain thin (parsing request, calling lib functions, returning responses).
+- All complex logic (payload building, validation, parsing) lives in `lib/` and `utils/`.
+
+### State-specific behavior
+
+The integration needs to correctly handle differences between:
+- AZ vs. TX
+- Owned-vehicle vs. non-owner (for example, "TX No-Owner" with `IsNonOwner: "Y"` and no vehicles array)
+
+---
+
+## Environment Variables
+
+Expected environment variables (in `.env.local`):
+
+```bash
+COVERCUBE_URL=https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action
+COVERCUBE_USERNAME=test@truvoinsurance.com
+COVERCUBE_PASSWORD=Truvo$2025
+COVERCUBE_PRODUCER_AZ=AZ1198
+COVERCUBE_PRODUCER_TX=TX1199
+```
+
+These values are **not hardcoded** in the source; they are injected via `process.env`.
+
+---
+
+## Development Conventions
+
+### Framework
+Next.js App Router with TypeScript
+
+### File location for API route
+```
+src/app/api/quote/route.ts
+```
+
+### Imports
+Use the alias `@/*` mapped to `./src/*` for clean imports, for example:
+```typescript
+import { buildCovercubeRequest } from "@/lib/buildRequest";
+```
+
+### Linting and formatting
+- ESLint for static analysis
+- Prettier for formatting
+
+### Naming
+- **Files**: camelCase (for example, `buildRequest.ts`, `covercubeClient.ts`)
+- **Types and interfaces**: PascalCase (for example, `CovercubeRequest`, `CovercubeResponse`)
