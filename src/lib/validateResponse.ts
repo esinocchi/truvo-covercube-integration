@@ -3,19 +3,18 @@
 import type { CovercubeResponse } from "@/types/covercube";
 
 /**
- * Validates and parses the Covercube API response
- * 
- * This function ensures the response contains all required fields
- * and can be extended to normalize or transform the data as needed
- * 
- * @param rawResponse - The raw response from Covercube
- * @returns The validated response
- * @throws Error if required fields are missing
+ * Validates the Covercube API response structure
+ *
+ * Ensures the response contains all required fields with correct types.
+ * Returns the response unchanged after validation.
+ *
+ * @param rawResponse - The raw response from Covercube API
+ * @returns The same response object after successful validation
+ * @throws Error if required fields are missing or have invalid types
  */
-export function parseCovercubeResponse(
+export function validateCovercubeResponse(
   rawResponse: CovercubeResponse
 ): CovercubeResponse {
-  // Validate required fields
   if (!rawResponse.quoteCode) {
     throw new Error("Missing quoteCode in Covercube response");
   }
@@ -40,8 +39,6 @@ export function parseCovercubeResponse(
     throw new Error("Invalid or missing payplan array in Covercube response");
   }
 
-  // Return the validated response
-  // In the future, you could transform/normalize the data here
   return rawResponse;
 }
 

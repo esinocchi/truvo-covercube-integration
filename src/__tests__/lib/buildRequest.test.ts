@@ -1,6 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { buildCovercubeRequest } from "@/lib/buildRequest";
-import type { QuoteInput } from "@/types/api";
+import type { 
+  ArizonaQuoteInput,
+  TexasQuoteInput, 
+  TexasNonOwnerQuoteInput 
+} from "@/types/api";
 import {
   arizonaQuoteInput,
   texasQuoteInput,
@@ -53,12 +57,14 @@ describe("buildCovercubeRequest", () => {
       });
     });
 
-    it("should include plate information for Arizona vehicles", () => {
+    it("should NOT include plate information for Arizona vehicles", () => {
       const result = buildCovercubeRequest(arizonaQuoteInput);
 
-      // Vehicle 2 has plate info
-      expect(result.vehicles?.[1].platenumber).toBe("7896541");
-      expect(result.vehicles?.[1].platestate).toBe("AZ");
+      // Plate fields should be stripped for AZ (requirement: 0)
+      expect(result.vehicles?.[0].platenumber).toBeUndefined();
+      expect(result.vehicles?.[0].platestate).toBeUndefined();
+      expect(result.vehicles?.[1].platenumber).toBeUndefined();
+      expect(result.vehicles?.[1].platestate).toBeUndefined();
     });
 
     it("should preserve all AZ coverage fields", () => {
@@ -73,10 +79,10 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Arizona input has PIP coverage", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...arizonaQuoteInput,
         PIP: "2500",
-      };
+      } as ArizonaQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Arizona policies do not support PIP coverage"
@@ -84,10 +90,10 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Arizona input has UMPD coverage", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...arizonaQuoteInput,
         UMPD: "25",
-      };
+      } as ArizonaQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Arizona policies do not support UMPD coverage"
@@ -95,10 +101,10 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Arizona input has IsNonOwner flag", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...arizonaQuoteInput,
         IsNonOwner: "Y",
-      };
+      } as ArizonaQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Arizona does not support non-owner policies"
@@ -106,7 +112,7 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Arizona input has no vehicles", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput: ArizonaQuoteInput = {
         ...arizonaQuoteInput,
         vehicles: [],
       };
@@ -117,15 +123,15 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Arizona vehicle has TX-specific fields", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...arizonaQuoteInput,
         vehicles: [
           {
-            ...arizonaQuoteInput.vehicles![0],
+            ...arizonaQuoteInput.vehicles[0],
             vehiclepurchasedate: "2025/01/01",
           },
         ],
-      };
+      } as ArizonaQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Vehicle 1 should not have vehiclepurchasedate for Arizona"
@@ -167,7 +173,7 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if Texas regular policy has no vehicles", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput: TexasQuoteInput = {
         ...texasQuoteInput,
         vehicles: [],
       };
@@ -177,15 +183,25 @@ describe("buildCovercubeRequest", () => {
       );
     });
 
-    it("should throw error if Texas regular policy has no PIP", () => {
-      const invalidInput: QuoteInput = {
+    it("should allow Texas regular policy without PIP (optional per requirements)", () => {
+      const inputWithoutPIP: TexasQuoteInput = {
         ...texasQuoteInput,
         PIP: undefined,
       };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas policies require PIP coverage"
-      );
+      // PIP is optional for TX regular (requirement: 1)
+      const result = buildCovercubeRequest(inputWithoutPIP);
+      expect(result.PIP).toBeUndefined();
+      expect(result.state).toBe("TX");
+    });
+
+    it("should strip IsNonOwner field from TX regular policies", () => {
+      // IsNonOwner should not be included for TX regular (requirement: 0)
+      const result = buildCovercubeRequest(texasQuoteInput);
+      
+      expect(result.IsNonOwner).toBeUndefined();
+      expect(result.state).toBe("TX");
+      expect(result.vehicles).toBeDefined();
     });
   });
 
@@ -208,17 +224,22 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if TX non-owner has vehicles", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...texasNonOwnerQuoteInput,
         vehicles: [
           {
             year: 2020,
             make: "TOYOTA",
             model: "CAMRY",
-            vehicleUse: "WRK",
+            vehicleUse: "WRK" as const,
+            gender: "M" as const,
+            dob: "1990/01/01",
+            firstName: "Test",
+            lastName: "Driver",
+            licenseState: "TX",
           },
         ],
-      };
+      } as TexasNonOwnerQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Texas non-owner policies cannot have vehicles"
@@ -226,36 +247,38 @@ describe("buildCovercubeRequest", () => {
     });
 
     it("should throw error if TX non-owner has roadsideAssistance", () => {
-      const invalidInput: QuoteInput = {
+      const invalidInput = {
         ...texasNonOwnerQuoteInput,
-        roadsideAssistance: "Y",
-      };
+        roadsideAssistance: "Y" as const,
+      } as TexasNonOwnerQuoteInput;
 
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
         "Texas non-owner policies cannot have roadsideAssistance"
       );
     });
 
-    it("should throw error if TX non-owner missing PIP", () => {
-      const invalidInput: QuoteInput = {
+    it("should allow TX non-owner without PIP (optional per requirements)", () => {
+      const inputWithoutPIP: TexasNonOwnerQuoteInput = {
         ...texasNonOwnerQuoteInput,
         PIP: undefined,
       };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas non-owner policies require PIP coverage"
-      );
+      // PIP is optional for TX non-owner (requirement: 1)
+      const result = buildCovercubeRequest(inputWithoutPIP);
+      expect(result.PIP).toBeUndefined();
+      expect(result.IsNonOwner).toBe("Y");
     });
 
-    it("should throw error if TX non-owner missing UMPD", () => {
-      const invalidInput: QuoteInput = {
+    it("should allow TX non-owner without UMPD (optional per requirements)", () => {
+      const inputWithoutUMPD: TexasNonOwnerQuoteInput = {
         ...texasNonOwnerQuoteInput,
         UMPD: undefined,
       };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas non-owner policies require UMPD coverage"
-      );
+      // UMPD is optional for TX non-owner (requirement: 1)
+      const result = buildCovercubeRequest(inputWithoutUMPD);
+      expect(result.UMPD).toBeUndefined();
+      expect(result.IsNonOwner).toBe("Y");
     });
   });
 

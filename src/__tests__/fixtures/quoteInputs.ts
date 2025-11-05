@@ -1,12 +1,18 @@
 // Test fixtures for QuoteInput based on Postman collection examples
+// Updated to match requirements JSON exactly
 
-import type { QuoteInput } from "@/types/api";
+import type { 
+  ArizonaQuoteInput, 
+  TexasQuoteInput, 
+  TexasNonOwnerQuoteInput 
+} from "@/types/api";
 
 /**
  * Arizona policy example
  * Based on Postman "AZ" request
+ * Compliant with AZ requirements (excludes all TX-only fields)
  */
-export const arizonaQuoteInput: QuoteInput = {
+export const arizonaQuoteInput: ArizonaQuoteInput = {
   // Transaction details
   policyTerm: "6 Months",
   inceptionDate: "2025/11/01",
@@ -18,21 +24,15 @@ export const arizonaQuoteInput: QuoteInput = {
   holderMiddleInitial: "A",
   holderLastName: "ITC0307",
   address: "235 S 190th Ave",
-  address2: "",
   city: "BUCKEYE",
   state: "AZ",
   zipCode: "85326",
   email: "Test.AZ@zywave.com",
   cellPhone: "9999999999",
   mailSame: "Y",
-  mailAddress: "",
-  mailAddress2: "",
-  mailCity: "",
-  mailState: "",
-  mailZipCode: "",
 
-  // Coverage (using documented AZ limits, not Postman's 30/60)
-  BI: "25/50",  // Corrected from Postman's "30/60"
+  // Coverage (using documented AZ limits)
+  BI: "25/50",
   PD: "15",
   UMBI: "25/50",
   UIMBI: "25/50",
@@ -53,7 +53,7 @@ export const arizonaQuoteInput: QuoteInput = {
   monthsinprior: "5",
   ispriorinsameagency: "YES",
 
-  // Vehicles
+  // Vehicles (AZ-compliant: no plate fields, no TX-specific fields)
   vehicles: [
     {
       year: 2022,
@@ -61,7 +61,6 @@ export const arizonaQuoteInput: QuoteInput = {
       model: "CAMRY",
       trim: "SE",
       vin: "4T1G11AK9NU630788",
-      roadsideAssistance: "Y",
       SE: "N",
       TR: "Y",
       COM: "500",
@@ -70,9 +69,7 @@ export const arizonaQuoteInput: QuoteInput = {
       antitheft: "PAA",
       braking: "ABSS",
       price: 27245.0,
-      weight: 0,
       drivetype: "2WD",
-      ridesharing: "N",
     },
     {
       year: 2022,
@@ -80,7 +77,6 @@ export const arizonaQuoteInput: QuoteInput = {
       model: "MIRAGE",
       trim: "G4 BLACK EDIT",
       vin: "ML32FUFJ7N",
-      roadsideAssistance: "N",
       SE: "N",
       TR: "N",
       COM: "500",
@@ -89,11 +85,7 @@ export const arizonaQuoteInput: QuoteInput = {
       antitheft: "PAA",
       braking: "ABSS",
       price: 15645.0,
-      weight: 0,
       drivetype: "2WD",
-      ridesharing: "Y",
-      platestate: "AZ",
-      platenumber: "7896541",
       parties: [
         {
           partyName: "Bank of America (Auto)",
@@ -108,7 +100,7 @@ export const arizonaQuoteInput: QuoteInput = {
     },
   ],
 
-  // Drivers
+  // Drivers (AZ-compliant: required fields for AZ)
   drivers: [
     {
       firstName: "Test4",
@@ -116,21 +108,11 @@ export const arizonaQuoteInput: QuoteInput = {
       dob: "1979/11/26",
       gender: "M",
       married: "Y",
-      points: 0,
       licenseNumber: "A53454557",
       licenseState: "AZ",
       licenseStatus: "RVKD",
-      employerName: "",
-      occupation: "ELECTRICIAN",  // Using documented code
-      businessPhone: "",
       sr22: "Y",
       Sr22Date: "2022/11/11",
-      excludeFromCoverage: "N",
-      av12: 0,
-      av24: 0,
-      av36: 0,
-      driverDNA: 10,
-      violations: [],
     },
     {
       firstName: "FeTest",
@@ -138,28 +120,11 @@ export const arizonaQuoteInput: QuoteInput = {
       dob: "1980/11/26",
       gender: "F",
       married: "Y",
-      points: 0,
       licenseNumber: "D55654588",
       licenseState: "AZ",
       licenseStatus: "INT",
-      employerName: "",
-      occupation: "CARPENTER",
-      businessPhone: "",
       sr22: "N",
-      Sr22Date: "",
-      excludeFromCoverage: "N",
-      av12: 0,
-      av24: 0,
-      av36: 0,
-      driverDNA: 10,
-      violations: [
-        {
-          date: "2022/11/26",
-          code: "SPEED",
-          description: "Speeding in a School Zone",
-          points: "0",
-        },
-      ],
+      Sr22Date: "2022/11/26",
     },
   ],
 };
@@ -167,8 +132,9 @@ export const arizonaQuoteInput: QuoteInput = {
 /**
  * Texas regular policy example
  * Based on Postman "TX" request
+ * Compliant with TX requirements (includes TX-optional fields)
  */
-export const texasQuoteInput: QuoteInput = {
+export const texasQuoteInput: TexasQuoteInput = {
   // Transaction details
   policyTerm: "6 Months",
   inceptionDate: "2025/11/01",
@@ -180,18 +146,18 @@ export const texasQuoteInput: QuoteInput = {
   holderMiddleInitial: "",
   holderLastName: "TXTest",
   address: "13808 Tercel Trce",
-  address2: "",
+  address2: "Apt 123",
   city: "MANOR",
   state: "TX",
   zipCode: "78653",
   email: "fdeliva@zywave.com",
   cellPhone: "1234567891",
   mailSame: "Y",
-  mailAddress: "",
+  mailAddress: "PO Box 123",
   mailAddress2: "",
-  mailCity: "",
-  mailState: "",
-  mailZipCode: "",
+  mailCity: "MANOR",
+  mailState: "TX",
+  mailZipCode: "78653",
 
   // Coverage
   BI: "30/60",
@@ -199,7 +165,7 @@ export const texasQuoteInput: QuoteInput = {
   UMBI: "30/60",
   UIMBI: "30/60",
   UMPD: "25",
-  MP: "500",  // Using documented value instead of "None"
+  MP: "500",
   PIP: "2500",
   roadsideAssistance: "Y",
 
@@ -210,16 +176,16 @@ export const texasQuoteInput: QuoteInput = {
   payplan: "EFTCC",
   homeownerDiscount: "Y",
 
-  // Prior insurance
+  // Prior insurance (TX-specific fields)
   ispriorpolicy: "YES",
-  priorpolicynumber: "",
+  priorpolicynumber: "TX123456",
   priordayslapse: 27,
   priorexpirationdate: "2025/08/01",
   monthsinprior: 15,
   priorbicoveragelimit: "30/60",
   priorpipcoveragelimit: 30,
 
-  // Vehicles
+  // Vehicles (TX-compliant: includes TX-optional fields)
   vehicles: [
     {
       year: 2022,
@@ -238,7 +204,7 @@ export const texasQuoteInput: QuoteInput = {
       antitheft: "PAA",
       braking: "ABSS",
       price: 28785.0,
-      weight: 0,
+      weight: 3500,
       drivetype: "2WD",
       ridesharing: "N",
       vehiclepurchasedate: "2025/01/01",
@@ -247,21 +213,21 @@ export const texasQuoteInput: QuoteInput = {
     },
   ],
 
-  // Drivers
+  // Drivers (TX-compliant: optional TX fields)
   drivers: [
     {
       firstName: "CCTX",
       lastName: "TXTest",
       dob: "1993/04/23",
       gender: "F",
+      licenseState: "TX",
       married: "N",
       points: 0,
-      licenseNumber: "",
-      licenseState: "TX",
+      licenseNumber: "TX123456",
       licenseStatus: "DUSA",
-      employerName: "",
+      employerName: "Acme Corp",
       occupation: "OTHER",
-      businessPhone: "",
+      businessPhone: "5551234567",
       sr22: "N",
       excludeFromCoverage: "N",
       av12: 0,
@@ -283,8 +249,9 @@ export const texasQuoteInput: QuoteInput = {
 /**
  * Texas non-owner policy example
  * Based on Postman "TX No-Owner" request
+ * Compliant with TX non-owner requirements
  */
-export const texasNonOwnerQuoteInput: QuoteInput = {
+export const texasNonOwnerQuoteInput: TexasNonOwnerQuoteInput = {
   // Transaction details
   policyTerm: "6 Months",
   inceptionDate: "2025/11/01",
@@ -309,13 +276,13 @@ export const texasNonOwnerQuoteInput: QuoteInput = {
   mailState: "",
   mailZipCode: "",
 
-  // Coverage
+  // Coverage (PIP and UMPD are optional per requirements)
   BI: "30/60",
   PD: "25",
   UMBI: "30/60",
   UIMBI: "30/60",
   UMPD: "25",
-  MP: "500",  // Using documented value instead of "None"
+  MP: "500",
   PIP: "2500",
 
   // Discounts & flags
@@ -334,23 +301,20 @@ export const texasNonOwnerQuoteInput: QuoteInput = {
   priorbicoveragelimit: "30/60",
   priorpipcoveragelimit: 30,
 
-  // Non-owner flag
+  // Non-owner flag (required for non-owner)
   IsNonOwner: "Y",
 
-  // No vehicles for non-owner
-  vehicles: undefined,
-
-  // Drivers
+  // Drivers (TX-compliant: optional TX fields)
   drivers: [
     {
       firstName: "CCTX",
       lastName: "TXTest",
       dob: "1993/04/23",
       gender: "F",
+      licenseState: "TX",
       married: "N",
       points: 0,
       licenseNumber: "",
-      licenseState: "TX",
       licenseStatus: "DUSA",
       employerName: "",
       occupation: "OTHER",
@@ -372,4 +336,3 @@ export const texasNonOwnerQuoteInput: QuoteInput = {
     },
   ],
 };
-

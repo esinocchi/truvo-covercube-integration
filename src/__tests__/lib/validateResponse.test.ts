@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { parseCovercubeResponse } from "@/lib/parseResponse";
+import { validateCovercubeResponse } from "@/lib/validateResponse";
 import type { CovercubeResponse } from "@/types/covercube";
 import {
   mockArizonaResponse,
@@ -7,10 +8,10 @@ import {
   mockTexasNonOwnerResponse,
 } from "../fixtures/covercubeResponses";
 
-describe("parseCovercubeResponse", () => {
+describe("validateCovercubeResponse", () => {
   describe("Valid Responses", () => {
-    it("should parse a valid Arizona response", () => {
-      const result = parseCovercubeResponse(mockArizonaResponse);
+    it("should validate a valid Arizona response", () => {
+      const result = validateCovercubeResponse(mockArizonaResponse);
 
       expect(result.quoteCode).toBe("AZ-123456");
       expect(result.quotePremium).toBe(855.54);
@@ -20,8 +21,8 @@ describe("parseCovercubeResponse", () => {
       expect(result.payplan).toHaveLength(2);
     });
 
-    it("should parse a valid Texas response", () => {
-      const result = parseCovercubeResponse(mockTexasResponse);
+    it("should validate a valid Texas response", () => {
+      const result = validateCovercubeResponse(mockTexasResponse);
 
       expect(result.quoteCode).toBe("TX-789012");
       expect(result.quotePremium).toBe(920.75);
@@ -31,8 +32,8 @@ describe("parseCovercubeResponse", () => {
       expect(result.payplan).toHaveLength(1);
     });
 
-    it("should parse a valid Texas non-owner response", () => {
-      const result = parseCovercubeResponse(mockTexasNonOwnerResponse);
+    it("should validate a valid Texas non-owner response", () => {
+      const result = validateCovercubeResponse(mockTexasNonOwnerResponse);
 
       expect(result.quoteCode).toBe("TXNO-345678");
       expect(result.quotePremium).toBe(412.5);
@@ -42,7 +43,7 @@ describe("parseCovercubeResponse", () => {
     });
 
     it("should return unchanged response when valid", () => {
-      const result = parseCovercubeResponse(mockArizonaResponse);
+      const result = validateCovercubeResponse(mockArizonaResponse);
 
       // Should be the same object (not transformed)
       expect(result).toEqual(mockArizonaResponse);
@@ -56,7 +57,7 @@ describe("parseCovercubeResponse", () => {
         quoteCode: "",
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Missing quoteCode in Covercube response"
       );
     });
@@ -67,7 +68,7 @@ describe("parseCovercubeResponse", () => {
         quotePremium: "not a number" as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing quotePremium in Covercube response"
       );
     });
@@ -78,7 +79,7 @@ describe("parseCovercubeResponse", () => {
         quotePremium: undefined as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing quotePremium in Covercube response"
       );
     });
@@ -89,7 +90,7 @@ describe("parseCovercubeResponse", () => {
         quoteTotal: null as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing quoteTotal in Covercube response"
       );
     });
@@ -100,7 +101,7 @@ describe("parseCovercubeResponse", () => {
         drivers: "not an array" as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing drivers array in Covercube response"
       );
     });
@@ -111,7 +112,7 @@ describe("parseCovercubeResponse", () => {
         coverages: null as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing coverages array in Covercube response"
       );
     });
@@ -122,7 +123,7 @@ describe("parseCovercubeResponse", () => {
         payplan: {} as any,
       };
 
-      expect(() => parseCovercubeResponse(invalidResponse)).toThrow(
+      expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
         "Invalid or missing payplan array in Covercube response"
       );
     });
@@ -137,7 +138,7 @@ describe("parseCovercubeResponse", () => {
         payplan: [],
       };
 
-      const result = parseCovercubeResponse(responseWithEmptyArrays);
+      const result = validateCovercubeResponse(responseWithEmptyArrays);
 
       expect(result.drivers).toEqual([]);
       expect(result.coverages).toEqual([]);
@@ -153,7 +154,7 @@ describe("parseCovercubeResponse", () => {
         quoteFeesTotal: 0,
       };
 
-      const result = parseCovercubeResponse(responseWithZeros);
+      const result = validateCovercubeResponse(responseWithZeros);
 
       expect(result.quotePremium).toBe(0);
       expect(result.quoteTotal).toBe(0);
@@ -166,7 +167,7 @@ describe("parseCovercubeResponse", () => {
         quoteTotal: -50.0,
       };
 
-      const result = parseCovercubeResponse(responseWithNegatives);
+      const result = validateCovercubeResponse(responseWithNegatives);
 
       expect(result.quotePremium).toBe(-100.0);
       expect(result.quoteTotal).toBe(-50.0);
@@ -175,7 +176,7 @@ describe("parseCovercubeResponse", () => {
 
   describe("Response Structure Validation", () => {
     it("should validate driver objects structure", () => {
-      const result = parseCovercubeResponse(mockArizonaResponse);
+      const result = validateCovercubeResponse(mockArizonaResponse);
 
       result.drivers.forEach((driver) => {
         expect(driver).toHaveProperty("firstName");
@@ -186,7 +187,7 @@ describe("parseCovercubeResponse", () => {
     });
 
     it("should validate coverage objects structure", () => {
-      const result = parseCovercubeResponse(mockTexasResponse);
+      const result = validateCovercubeResponse(mockTexasResponse);
 
       result.coverages.forEach((coverage) => {
         expect(coverage).toHaveProperty("coverageCode");
@@ -197,7 +198,7 @@ describe("parseCovercubeResponse", () => {
     });
 
     it("should validate payplan objects structure", () => {
-      const result = parseCovercubeResponse(mockArizonaResponse);
+      const result = validateCovercubeResponse(mockArizonaResponse);
 
       result.payplan.forEach((plan) => {
         expect(plan).toHaveProperty("description");
@@ -210,7 +211,7 @@ describe("parseCovercubeResponse", () => {
     });
 
     it("should include viewQuote and consumerBridge URLs", () => {
-      const result = parseCovercubeResponse(mockArizonaResponse);
+      const result = validateCovercubeResponse(mockArizonaResponse);
 
       expect(result.viewQuote).toContain("https://");
       expect(result.consumerBridge).toContain("https://");
