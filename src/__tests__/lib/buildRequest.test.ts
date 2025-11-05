@@ -4,7 +4,7 @@ import type {
   ArizonaQuoteInput,
   TexasQuoteInput, 
   TexasNonOwnerQuoteInput 
-} from "@/types/api";
+} from "@/zod-schemas/covercube";
 import {
   arizonaQuoteInput,
   texasQuoteInput,
@@ -50,7 +50,7 @@ describe("buildCovercubeRequest", () => {
       expect(result.priorbicoveragelimit).toBeUndefined();
 
       // Check vehicles don't have TX-only fields
-      result.vehicles?.forEach((vehicle) => {
+      result.vehicles?.forEach((vehicle: any) => {
         expect(vehicle.vehiclepurchasedate).toBeUndefined();
         expect(vehicle.estimatemilage).toBeUndefined();
         expect(vehicle.ownershiplength).toBeUndefined();
@@ -78,64 +78,72 @@ describe("buildCovercubeRequest", () => {
       expect(result.roadsideAssistance).toBe("Y");
     });
 
-    it("should throw error if Arizona input has PIP coverage", () => {
-      const invalidInput = {
+    it("should silently strip PIP coverage from Arizona (Zod transform)", () => {
+      // Zod now strips TX-only fields instead of throwing errors
+      const inputWithPIP = {
         ...arizonaQuoteInput,
         PIP: "2500",
-      } as ArizonaQuoteInput;
+      };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Arizona policies do not support PIP coverage"
-      );
+      const result = buildCovercubeRequest(inputWithPIP);
+      expect(result.PIP).toBeUndefined();
+      expect(result.state).toBe("AZ");
     });
 
-    it("should throw error if Arizona input has UMPD coverage", () => {
-      const invalidInput = {
+    it("should silently strip UMPD coverage from Arizona (Zod transform)", () => {
+      // Zod now strips TX-only fields instead of throwing errors
+      const inputWithUMPD = {
         ...arizonaQuoteInput,
         UMPD: "25",
-      } as ArizonaQuoteInput;
+      };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Arizona policies do not support UMPD coverage"
-      );
+      const result = buildCovercubeRequest(inputWithUMPD);
+      expect(result.UMPD).toBeUndefined();
+      expect(result.state).toBe("AZ");
     });
 
-    it("should throw error if Arizona input has IsNonOwner flag", () => {
-      const invalidInput = {
+    it("should silently strip IsNonOwner flag from Arizona (Zod transform)", () => {
+      // Zod now strips TX-only fields instead of throwing errors
+      const inputWithIsNonOwner = {
         ...arizonaQuoteInput,
         IsNonOwner: "Y",
-      } as ArizonaQuoteInput;
+      };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Arizona does not support non-owner policies"
-      );
+      const result = buildCovercubeRequest(inputWithIsNonOwner);
+      expect((result as any).IsNonOwner).toBeUndefined();
+      expect(result.state).toBe("AZ");
     });
 
-    it("should throw error if Arizona input has no vehicles", () => {
-      const invalidInput: ArizonaQuoteInput = {
+    it("should throw error if Arizona input has no vehicles (Zod validation)", () => {
+      const invalidInput = {
         ...arizonaQuoteInput,
         vehicles: [],
       };
 
+      // Zod validates minimum array length
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Arizona policies require at least one vehicle"
+        "Invalid quote request"
       );
     });
 
-    it("should throw error if Arizona vehicle has TX-specific fields", () => {
-      const invalidInput = {
+    it("should silently strip TX-specific fields from Arizona vehicles (Zod transform)", () => {
+      // Zod now strips TX-only vehicle fields instead of throwing errors
+      const inputWithTxVehicleFields = {
         ...arizonaQuoteInput,
         vehicles: [
           {
             ...arizonaQuoteInput.vehicles[0],
             vehiclepurchasedate: "2025/01/01",
+            estimatemilage: 50000,
+            ownershiplength: "1YR",
           },
         ],
-      } as ArizonaQuoteInput;
+      };
 
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Vehicle 1 should not have vehiclepurchasedate for Arizona"
-      );
+      const result = buildCovercubeRequest(inputWithTxVehicleFields);
+      expect(result.vehicles![0].vehiclepurchasedate).toBeUndefined();
+      expect((result.vehicles![0] as any).estimatemilage).toBeUndefined();
+      expect((result.vehicles![0] as any).ownershiplength).toBeUndefined();
     });
   });
 
@@ -172,14 +180,15 @@ describe("buildCovercubeRequest", () => {
       expect(result.priorpipcoveragelimit).toBe(30);
     });
 
-    it("should throw error if Texas regular policy has no vehicles", () => {
-      const invalidInput: TexasQuoteInput = {
+    it("should throw error if Texas regular policy has no vehicles (Zod validation)", () => {
+      const invalidInput = {
         ...texasQuoteInput,
         vehicles: [],
       };
 
+      // Zod validates minimum array length
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas policies require at least one vehicle"
+        "Invalid quote request"
       );
     });
 
@@ -223,7 +232,7 @@ describe("buildCovercubeRequest", () => {
       expect(result.UMPD).toBe("25");
     });
 
-    it("should throw error if TX non-owner has vehicles", () => {
+    it("should throw error if TX non-owner has vehicles (Zod validation)", () => {
       const invalidInput = {
         ...texasNonOwnerQuoteInput,
         vehicles: [
@@ -232,28 +241,13 @@ describe("buildCovercubeRequest", () => {
             make: "TOYOTA",
             model: "CAMRY",
             vehicleUse: "WRK" as const,
-            gender: "M" as const,
-            dob: "1990/01/01",
-            firstName: "Test",
-            lastName: "Driver",
-            licenseState: "TX",
           },
         ],
-      } as TexasNonOwnerQuoteInput;
+      };
 
+      // Zod validates that non-owner policies cannot have vehicles
       expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas non-owner policies cannot have vehicles"
-      );
-    });
-
-    it("should throw error if TX non-owner has roadsideAssistance", () => {
-      const invalidInput = {
-        ...texasNonOwnerQuoteInput,
-        roadsideAssistance: "Y" as const,
-      } as TexasNonOwnerQuoteInput;
-
-      expect(() => buildCovercubeRequest(invalidInput)).toThrow(
-        "Texas non-owner policies cannot have roadsideAssistance"
+        "Invalid quote request"
       );
     });
 

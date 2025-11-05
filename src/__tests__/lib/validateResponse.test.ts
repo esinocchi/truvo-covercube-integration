@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { validateCovercubeResponse } from "@/lib/validateResponse";
-import type { CovercubeResponse } from "@/types/covercube";
+import type { CovercubeResponse } from "@/zod-schemas/covercube";
 import {
   mockArizonaResponse,
   mockTexasResponse,
@@ -50,15 +50,16 @@ describe("validateCovercubeResponse", () => {
     });
   });
 
-  describe("Missing Required Fields", () => {
+  describe("Missing Required Fields (Zod Validation)", () => {
     it("should throw error if quoteCode is missing", () => {
       const invalidResponse = {
         ...mockArizonaResponse,
         quoteCode: "",
       };
 
+      // Zod validates string min length
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Missing quoteCode in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -68,8 +69,9 @@ describe("validateCovercubeResponse", () => {
         quotePremium: "not a number" as any,
       };
 
+      // Zod validates type
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing quotePremium in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -79,8 +81,9 @@ describe("validateCovercubeResponse", () => {
         quotePremium: undefined as any,
       };
 
+      // Zod validates required fields
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing quotePremium in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -90,8 +93,9 @@ describe("validateCovercubeResponse", () => {
         quoteTotal: null as any,
       };
 
+      // Zod validates type
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing quoteTotal in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -101,8 +105,9 @@ describe("validateCovercubeResponse", () => {
         drivers: "not an array" as any,
       };
 
+      // Zod validates array type
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing drivers array in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -112,8 +117,9 @@ describe("validateCovercubeResponse", () => {
         coverages: null as any,
       };
 
+      // Zod validates array type
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing coverages array in Covercube response"
+        "Invalid Covercube response"
       );
     });
 
@@ -123,8 +129,9 @@ describe("validateCovercubeResponse", () => {
         payplan: {} as any,
       };
 
+      // Zod validates array type
       expect(() => validateCovercubeResponse(invalidResponse)).toThrow(
-        "Invalid or missing payplan array in Covercube response"
+        "Invalid Covercube response"
       );
     });
   });

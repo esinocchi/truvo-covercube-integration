@@ -1,5 +1,5 @@
 // src/lib/validateInput.ts
-import type { QuoteInput } from "@/types/api";
+import type { QuoteInput } from "@/zod-schemas/covercube";
 
 /**
  * Validates the input data for the quote request

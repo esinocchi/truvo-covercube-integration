@@ -1,6 +1,6 @@
 // Mock Covercube API responses for testing
 
-import type { CovercubeResponse } from "@/types/covercube";
+import type { CovercubeResponse } from "@/zod-schemas/covercube";
 
 export const mockArizonaResponse: CovercubeResponse = {
   quoteCode: "AZ-123456",

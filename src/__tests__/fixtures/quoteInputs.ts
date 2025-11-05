@@ -5,7 +5,7 @@ import type {
   ArizonaQuoteInput, 
   TexasQuoteInput, 
   TexasNonOwnerQuoteInput 
-} from "@/types/api";
+} from "@/zod-schemas/covercube";
 
 /**
  * Arizona policy example

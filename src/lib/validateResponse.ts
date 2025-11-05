@@ -1,44 +1,31 @@
-// src/lib/parseResponse.ts
+// src/lib/validateResponse.ts
 
-import type { CovercubeResponse } from "@/types/covercube";
+import { CovercubeResponseSchema } from "@/zod-schemas/covercube";
+import type { CovercubeResponse } from "@/zod-schemas/covercube";
+import { ZodError } from "zod";
 
 /**
- * Validates the Covercube API response structure
+ * Validates the Covercube API response structure using Zod
  *
  * Ensures the response contains all required fields with correct types.
- * Returns the response unchanged after validation.
+ * Uses the CovercubeResponseSchema for comprehensive validation.
  *
- * @param rawResponse - The raw response from Covercube API
- * @returns The same response object after successful validation
+ * @param rawResponse - The raw response from Covercube API (unknown type)
+ * @returns The validated and typed response object
  * @throws Error if required fields are missing or have invalid types
  */
 export function validateCovercubeResponse(
-  rawResponse: CovercubeResponse
+  rawResponse: unknown
 ): CovercubeResponse {
-  if (!rawResponse.quoteCode) {
-    throw new Error("Missing quoteCode in Covercube response");
+  try {
+    return CovercubeResponseSchema.parse(rawResponse);
+  } catch (e) {
+    if (e instanceof ZodError) {
+      // Format Zod errors into developer-friendly messages
+      const summary = e.issues.map(i => `${i.path.join(".")}: ${i.message}`).join("; ");
+      throw new Error(`Invalid Covercube response: ${summary}`);
+    }
+    throw e;
   }
-
-  if (typeof rawResponse.quotePremium !== "number") {
-    throw new Error("Invalid or missing quotePremium in Covercube response");
-  }
-
-  if (typeof rawResponse.quoteTotal !== "number") {
-    throw new Error("Invalid or missing quoteTotal in Covercube response");
-  }
-
-  if (!Array.isArray(rawResponse.drivers)) {
-    throw new Error("Invalid or missing drivers array in Covercube response");
-  }
-
-  if (!Array.isArray(rawResponse.coverages)) {
-    throw new Error("Invalid or missing coverages array in Covercube response");
-  }
-
-  if (!Array.isArray(rawResponse.payplan)) {
-    throw new Error("Invalid or missing payplan array in Covercube response");
-  }
-
-  return rawResponse;
 }
 

@@ -1,6 +1,6 @@
 // src/lib/constants.ts
 
-import type { State, VehicleUse, Occupation, OwnershipLength, LicenseStatus } from "@/types/covercube";
+import type { State, VehicleUse, Occupation, OwnershipLength, LicenseStatus } from "@/zod-schemas/covercube";
 
 // ============================================
 // STATES

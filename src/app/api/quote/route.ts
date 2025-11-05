@@ -1,7 +1,7 @@
 // src/app/api/quote/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import type { QuoteInput } from "@/types/api";
+import type { QuoteInput } from "@/zod-schemas/covercube";
 import { buildCovercubeRequest } from "@/lib/buildRequest";
 import { callCovercubeAPI } from "@/lib/covercubeClient";
 import { validateCovercubeResponse } from "@/lib/validateResponse";

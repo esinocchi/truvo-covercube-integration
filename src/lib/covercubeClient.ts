@@ -1,6 +1,6 @@
 // src/lib/covercubeClient.ts
 
-import type { CovercubeRequest, CovercubeResponse } from "@/types/covercube";
+import type { CovercubeRequest, CovercubeResponse } from "@/zod-schemas/covercube";
 import { config } from "@/config";
 
 /**
