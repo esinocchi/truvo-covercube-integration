@@ -211,6 +211,7 @@ export const ArizonaRequestSchema = BasePolicySchema.extend({
 }).superRefine((obj, ctx) => {
   // If someone sends IsNonOwner on AZ, quietly drop it later.
   // No hard errors here to keep parity with your tolerant builder.
+  // placeholder for future validation
 }).transform((obj) => {
   // Strip TX-only top-level fields for AZ
   const {
@@ -263,6 +264,9 @@ export const TexasNonOwnerRequestSchema = BasePolicySchema.extend({
  *
  * Usage:
  *   const parsed = parseAndSanitizeQuote(input);
+ * @param input - The input to parse and sanitize
+ * @returns The sanitized object
+ * @throws Error if the input is invalid or unsupported
  */
 export function parseAndSanitizeQuote(input: unknown) {
   // Lightweight pre-checks to choose schema

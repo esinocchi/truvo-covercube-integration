@@ -1,232 +1,142 @@
-# API Documentation vs Postman Collection Discrepancies
+# 🧾 Covercube API: Documentation vs. Postman — Discrepancies Only
 
-This document catalogs discrepancies found between the official Covercube Rate Quote API documentation and the provided Postman collection examples.
+**Purpose:**  
+List *only* the mismatches and inconsistencies between the **Covercube Rate Quote API Documentation** and the **Truvo Dev Postman Collection** across all supported states:  
+- Arizona (AZ)  
+- Texas (TX – Owned Vehicle)  
+- Texas (TX – Non-Owner)
 
-**Assessment Decision:** Our implementation follows the **official API documentation** strictly. The Postman examples may contain test data that doesn't conform to documented limits, or the API may have broader acceptance criteria than documented.
-
----
-
-## 1. Arizona BI Coverage Limit
-
-### Discrepancy
-**Postman Collection (AZ example, line 26):**
-```json
-"BI": "30/60"
-```
-
-**API Documentation (Arizona Coverage Limits Table):**
-| Code | Documented Limits |
-|------|-------------------|
-| BI   | 25/50, 50/100, 100/300 |
-
-**Issue:** `30/60` is **NOT** a documented Arizona BI limit, but it appears in the official Postman example.
-
-**Our Implementation:** 
-```typescript
-export const AZ_COVERAGE_LIMITS = {
-  BI: ["25/50", "50/100", "100/300"],  // Strict per docs
-  // ...
-}
-```
-
-**Note:** `30/60` is a valid **Texas** BI limit, suggesting possible copy/paste error in Postman collection.
+> These are the differences — fields, values, formats, or behaviors that do **not** align between the two sources.
 
 ---
 
-## 2. Arizona Driver Occupation Field
+## 1. Global Discrepancies
 
-### Discrepancy
-**Postman Collection (AZ example, line 17, driver 1):**
-```json
-"occupation": "Electrician/Linesman"
-```
-
-**API Documentation (Occupation Types Table):**
-| Code | Description |
-|------|-------------|
-| ELECTRICIAN | Electrician |
-| (no "Electrician/Linesman" code documented) |
-
-**Issue:** The value `"Electrician/Linesman"` is **NOT** in the documented occupation codes list.
-
-**Our Implementation:**
-```typescript
-export type Occupation =
-  | "ELECTRICIAN"     // Documented code
-  | "OTHER"
-  | "CARPENTER"
-  // ... (17 total documented codes)
-```
-
-**API Documentation States:**
-- AZ Driver Object (line 186): `licenseStatus` field states license status values like "MX, INT, SUSP, EX, RVKD, VALID, **etc.**"
-- The "etc." suggests there may be undocumented values accepted by the API
-
-**Note:** The Postman example uses a **free-form text description** rather than the documented code. This suggests:
-1. The API may accept both codes AND descriptions
-2. The documentation is incomplete
-3. The Postman example is outdated
+| Area | Docs | Postman | Resolution |
+|------|------|----------|-------------|
+| **Mailing Fields** | Not listed for AZ; optional for TX | Present in all requests (`address2`, `mailAddress`, `mailAddress2`, `mailCity`, `mailState`, `mailZipCode`) | Mark optional globally. |
+| **License Status** | Enumerated: `VALID`, `SUSP`, `RVKD`, `EX`, `MX`, `INT` | Adds `DUSA` | Allow any string for `licenseStatus`. |
+| **License State** | “State that issued the license” | Always matches quote state | Accept any 2-letter state code. |
+| **Payplan Codes** | Only `FP`, `6P`, `6P2` listed | Uses `"EFTCC"` | Accept any string for `payplan`. |
+| **Date Format** | `YYYY/MM/DD` required | Sometimes empty (`Sr22Date`) | Allow empty string or omit field. |
+| **Coverage Code Labels** | Uses `COLL`, `CMP` (TX coverage table) | Uses `COL`, `COM` | Normalize to `COL` / `COM`. |
+| **Numeric Field Types** | `priordayslapse` and `priorpipcoveragelimit` listed as strings | Numbers in Postman | Accept both string or number. |
 
 ---
 
-## 3. Texas MP Coverage Value
+## 2. Arizona (Owned Vehicle)
 
-### Observation
-**Postman Collection (TX example, line 30 & TX Non-Owner line 30):**
-```json
-"MP": "None"
-```
+### Policy-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `address2`, `mailAddress`, `mailAddress2`, `mailCity`, `mailState`, `mailZipCode` | Not in docs | Present | Treat as optional. |
+| `roadsideAssistance` | Policy-level only | Also present at vehicle level | Allow both policy and vehicle level. |
 
-**API Documentation (Texas Coverage Table, lines 855-858):**
-| Code | DisplayTextValue | CoverageValue |
-|------|------------------|---------------|
-| MP   | $500             | 500 |
-| MP   | $1,000           | 1000 |
-| MP   | $2,000           | 2000 |
-| MP   | $5,000           | 5000 |
+### Vehicle-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `platenumber`, `platestate` | Not listed in AZ docs | Present | Optional; strip before sending. |
+| `weight`, `ridesharing`, `roadsideAssistance`, `parties[]` | Not defined | Present (`parties` includes `address1`, `address2`) | Optional; tolerate. |
 
-**Issue:** `"None"` is **NOT** documented as a valid MP value.
+### Driver-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `points`, `employerName`, `occupation`, `businessPhone`, `excludeFromCoverage`, `av12`, `av24`, `av36`, `driverDNA`, `violations[]` | Not listed for AZ | Present | Make optional. |
+| `Sr22Date` | Must follow `YYYY/MM/DD` if provided | Sometimes empty | Allow empty string. |
 
-**Our Implementation:**
-```typescript
-export const TX_COVERAGE_LIMITS = {
-  MP: ["500", "1000", "2000", "5000"],  // Per docs
-  // ...
-}
-```
-
-**Note:** The string `"None"` likely indicates **no medical payments coverage selected**, but this is not explicitly documented as a valid API value.
+### Coverage Differences
+| Coverage | Docs | Postman | Resolution |
+|-----------|------|----------|-------------|
+| `BI` | 25/50, 50/100, 100/300 | `30/60` | Accept additional `30/60` value. |
 
 ---
 
-## 4. Arizona vs Texas BI/UMBI/UIMBI Limits Overlap
+## 3. Texas (Owned Vehicle)
 
-### Observation
-**Arizona Documentation:**
-- BI: 25/50, 50/100, 100/300
-- UMBI: 25/50, 50/100, 100/300
-- UIMBI: 25/50, 50/100, 100/300
+### Policy-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `payplan` | Lists only `FP`, `6P`, `6P2` | Uses `"EFTCC"` | Accept arbitrary string. |
 
-**Texas Documentation:**
-- BI: 30/60, 50/100, 100/300
-- UMBI: 30/60, 50/100, 100/300
-- UIMBI: 30/60, 50/100, 100/300
+### Vehicle-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| *(none)* | — | — | All TX vehicle fields match. |
 
-**Issue:** Both states share `50/100` and `100/300`, but differ on the minimum:
-- Arizona minimum: `25/50`
-- Texas minimum: `30/60`
+### Driver-Level Differences
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `licenseStatus` | Sample list only (VALID, SUSP, etc.) | `"DUSA"` | Accept any string. |
+| `occupation` | Uppercase codes (e.g., `OTHER`, `CARPENTER`) | Human-readable (`"Other"`) | Accept free text or map later. |
 
-This is **consistent** between docs and implementation, but the Postman AZ example incorrectly uses TX's minimum (`30/60`).
-
----
-
-## 5. License Status "DUSA" Value
-
-### Observation
-**Postman Collection (TX examples, driver line):**
-```json
-"licenseStatus": "DUSA"
-```
-
-**API Documentation (line 186 for AZ, line 431 for TX):**
-- Lists: "VALID, SUSP, etc."
-- Our implementation includes "DUSA" in the `LicenseStatus` type
-
-**Our Implementation:**
-```typescript
-export type LicenseStatus = 
-  | "VALID" 
-  | "SUSP" 
-  | "RVKD" 
-  | "EX" 
-  | "MX" 
-  | "INT" 
-  | "DUSA";  // From Postman examples, not explicitly documented
-```
-
-**Note:** "DUSA" appears in Postman but is **not explicitly listed** in the API docs. We include it because it's in working examples.
+### Coverage Differences
+| Coverage | Docs | Postman | Resolution |
+|-----------|------|----------|-------------|
+| `MP` | Numeric (500, 1000, 2000, 5000) | `"None"` | Treat `"None"` as null or zero-equivalent. |
 
 ---
 
-## 6. PayPlan Code "EFTCC"
+## 4. Texas (Non-Owner)
 
-### Observation
-**Postman Collection (all examples):**
-```json
-"payplan": "EFTCC"
-```
-
-**API Documentation (Pay Plan Types Table, lines 822-831):**
-| Code | Description |
-|------|-------------|
-| FP   | Full premium payment |
-| 6P   | 6 Monthly Payments - EFT or Recurring CC |
-| 6P2  | 6 Monthly Payments - Direct Billing |
-
-**Issue:** `"EFTCC"` is **NOT** documented in the Pay Plan Types table.
-
-**Our Implementation:**
-```typescript
-export const PAY_PLAN_TYPES = {
-  FULL: "FP",
-  SIX_MONTHLY: "6P",
-  SIX_MONTHLY_DIRECT: "6P2",
-} as const;
-```
-
-**Note:** "EFTCC" likely means "Electronic Funds Transfer Credit Card" but is not in the mapping table. The Postman examples use it consistently, suggesting it's a valid but undocumented code.
+| Field | Docs | Postman | Resolution |
+|--------|------|----------|-------------|
+| `roadsideAssistance` | Not mentioned | Absent | Allow optional. |
+| `MP` | Numeric value | `"None"` | Accept `"None"`. |
 
 ---
 
-## Summary
+## 5. Formatting / Typing Mismatches
 
-| # | Field | Postman Value | Documented Values | Severity |
-|---|-------|---------------|-------------------|----------|
-| 1 | AZ BI | `"30/60"` | `["25/50", "50/100", "100/300"]` | ⚠️ High |
-| 2 | AZ occupation | `"Electrician/Linesman"` | `"ELECTRICIAN"` (code) | ⚠️ Medium |
-| 3 | TX/TX-NO MP | `"None"` | `["500", "1000", "2000", "5000"]` | ⚠️ Medium |
-| 4 | payplan | `"EFTCC"` | `["FP", "6P", "6P2"]` | ℹ️ Low |
-| 5 | licenseStatus | `"DUSA"` | Not explicitly listed | ℹ️ Low |
+| Field | Docs Type | Postman Type | Resolution |
+|--------|------------|---------------|-------------|
+| `priordayslapse` | string | number | Accept both. |
+| `priorpipcoveragelimit` | decimal | integer | Accept both. |
 
 ---
 
-## Recommendations
+## 6. Internal Documentation Inconsistencies
 
-1. **For Production:** Contact Covercube API support to clarify:
-   - Valid Arizona BI limits (is `30/60` actually accepted?)
-   - Occupation field format (codes vs. descriptions)
-   - Complete list of payplan codes
-   - Whether `"None"` is valid for MP coverage
-
-2. **For This Assessment:** 
-   - Continue following **strict documentation**
-   - Add validation warnings when undocumented values are detected
-   - Document these discrepancies (this file)
-   - Demonstrate understanding of real-world API inconsistencies
-
-3. **Future Enhancement:**
-   - Implement "relaxed validation mode" flag for testing
-   - Log warnings for undocumented-but-accepted values
-   - Add unit tests covering both documented and Postman example values
+| Topic | Docs Description | Resolution |
+|--------|------------------|-------------|
+| **Coverage Codes** | TX coverage display table uses `COLL` / `CMP`, while vehicle object uses `COL` / `COM`. | Standardize on `COL` / `COM`. |
+| **Payplan Codes** | Mapping table lists `FP`, `6P`, `6P2`; examples use `"EFTCC"`. | Allow any string. |
+| **Occupation Codes** | Uppercase codes in mapping table | Postman sends readable strings | Accept any string input. |
+| **AZ Coverage Limits** | BI 25/50, 50/100, 100/300 only | 30/60 used in Postman | Add 30/60 to allowed set. |
 
 ---
 
-## Implementation Notes
+## 7. Summary of All Postman-Only Fields
 
-Our `buildRequest.ts` implementation:
-- ✅ Validates against **documented coverage limits**
-- ✅ Strips state-inappropriate fields
-- ✅ Enforces state-specific requirements
-- ⚠️ **May reject valid Postman example values** due to documentation inconsistencies
-
-This is **intentional** for the assessment to demonstrate:
-1. Ability to read and follow specifications
-2. Recognition of documentation quality issues
-3. Appropriate escalation of ambiguities
+| Context | Fields |
+|----------|--------|
+| **AZ Policy** | `address2`, `mailAddress`, `mailAddress2`, `mailCity`, `mailState`, `mailZipCode` |
+| **AZ Vehicle** | `platenumber`, `platestate`, `weight`, `ridesharing`, `roadsideAssistance`, `parties[]` |
+| **AZ Driver** | `points`, `employerName`, `occupation`, `businessPhone`, `excludeFromCoverage`, `av12`, `av24`, `av36`, `driverDNA`, `violations[]` |
+| **TX Driver** | `licenseStatus: "DUSA"` |
+| **Cross-State Formatting** | Mixed numeric/string (`priordayslapse`, `priorpipcoveragelimit`), `MP` = `"None"`, flexible coverage limits. |
 
 ---
 
-**Document Version:** 1.0  
-**Last Updated:** 2025-11-04  
-**Author:** Integration Assessment
+## 8. Coverage Limit Discrepancies (All States)
 
+| Coverage | Docs | Postman | Resolution |
+|-----------|------|----------|-------------|
+| **AZ BI** | 25/50, 50/100, 100/300 | 30/60 | Accept 30/60 as valid. |
+| **TX MP** | Numeric (500, 1000, etc.) | `"None"` | Treat `"None"` as no coverage. |
+| **TX Code Labels** | COLL/CMP | COL/COM | Normalize to COL/COM. |
+
+---
+
+## 9. Implementation Notes
+
+- All discrepancies have been handled by making the affected fields **optional** or **flexible** in the Zod schemas.  
+- AZ requests automatically **strip TX-only fields** (plates, ownership length, purchase date).  
+- License-related fields are **non-restrictive**.  
+- Coverage limits and `payplan` are **free-form strings**.  
+- TX Non-Owner policies **forbid vehicles** but retain TX fields.  
+
+---
+
+**Sources:**  
+- *Covercube Rate Quote API Documentation* (pp. 2–26):contentReference[oaicite:0]{index=0}  
+- *Truvo Dev Postman Collection* (`AZ`, `TX`, `TX No-Owner`):contentReference[oaicite:1]{index=1}  

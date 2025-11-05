@@ -1,36 +1,18 @@
-// src/lib/constants.ts
-
 import type { State, VehicleUse, Occupation, OwnershipLength, LicenseStatus } from "@/zod-schemas/covercube";
-
-// ============================================
-// STATES
-// ============================================
 
 export const STATES: Record<State, State> = {
   AZ: "AZ",
   TX: "TX",
 } as const;
 
-// ============================================
-// TRANSACTION TYPES
-// ============================================
-
 export const TRANS_TYPES = {
   NEW_BUSINESS: "NB"
 } as const;
-
-// ============================================
-// POLICY TERMS
-// ============================================
 
 export const POLICY_TERMS = {
   SIX_MONTHS: "6 Months",
   TWELVE_MONTHS: "12 Months",
 } as const;
-
-// ============================================
-// COVERAGE LIMITS - ARIZONA
-// ============================================
 
 export const AZ_COVERAGE_LIMITS = {
   BI: ["25/50", "50/100", "100/300"],
@@ -41,10 +23,6 @@ export const AZ_COVERAGE_LIMITS = {
   COM: ["500", "1000"],
   COL: ["500", "1000"],
 } as const;
-
-// ============================================
-// COVERAGE LIMITS - TEXAS
-// ============================================
 
 export const TX_COVERAGE_LIMITS = {
   BI: ["30/60", "50/100", "100/300"],
@@ -58,10 +36,6 @@ export const TX_COVERAGE_LIMITS = {
   CMP: ["250", "500", "1000"],
 } as const;
 
-// ============================================
-// VEHICLE USAGE TYPES
-// ============================================
-
 export const VEHICLE_USAGE: Record<VehicleUse, string> = {
   WRK: "Work",
   SCH: "School",
@@ -69,10 +43,6 @@ export const VEHICLE_USAGE: Record<VehicleUse, string> = {
   ART: "Artisan",
   BUS: "Business",
 } as const;
-
-// ============================================
-// OCCUPATION TYPES
-// ============================================
 
 export const OCCUPATIONS: Record<Occupation, string> = {
   OTHER: "Other",
@@ -101,10 +71,6 @@ export const OCCUPATIONS: Record<Occupation, string> = {
   LABOR: "Technical/Skilled Labor",
 } as const;
 
-// ============================================
-// LICENSE STATUS
-// ============================================
-
 export const LICENSE_STATUS_MAP: Record<LicenseStatus, string> = {
   VALID: "Valid",
   SUSP: "Suspended",
@@ -114,10 +80,6 @@ export const LICENSE_STATUS_MAP: Record<LicenseStatus, string> = {
   INT: "International",
   DUSA: "DUSA",
 } as const;
-
-// ============================================
-// OWNERSHIP LENGTH
-// ============================================
 
 export const OWNERSHIP_LENGTH_MAP: Record<OwnershipLength, string> = {
   NOREG: "Not registered in my name",
@@ -131,54 +93,48 @@ export const OWNERSHIP_LENGTH_MAP: Record<OwnershipLength, string> = {
   UNK: "Unknown",
 } as const;
 
-// ============================================
-// PAY PLAN TYPES
-// ============================================
-
 export const PAY_PLAN_TYPES = {
   FULL: "FP",
   SIX_MONTHLY: "6P",
   SIX_MONTHLY_DIRECT: "6P2",
 } as const;
 
-// ============================================
-// YES/NO FLAGS
-// ============================================
-
 export const YES_NO = {
   YES: "Y",
   NO: "N",
 } as const;
-
-// ============================================
-// DRIVE TYPES
-// ============================================
 
 export const DRIVE_TYPES = {
   TWO_WHEEL: "2WD",
   FOUR_WHEEL: "4WD",
 } as const;
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-
 /**
- * Get producer code for a given state
+ * Retrieves state-specific producer code required by Covercube for authentication
+ *
+ * Each state requires its own producer code to ensure quotes are generated under
+ * the correct insurance license and regulatory framework.
  */
 export function getProducerCodeForState(state: State, producerCodes: Record<State, string>): string {
   return producerCodes[state];
 }
 
 /**
- * Check if a state requires specific TX-only fields
+ * Determines if state requires Texas-specific fields (UMPD, PIP, IsNonOwner)
+ *
+ * Used for request routing to ensure TX non-owner policies exclude vehicles
+ * and TX regular policies exclude the IsNonOwner flag, as Covercube will
+ * reject requests with inappropriate fields for the state.
  */
 export function isTexasState(state: State): boolean {
   return state === "TX";
 }
 
 /**
- * Validate coverage limit for a given state
+ * Validates coverage limit against state-specific allowed values
+ *
+ * Prevents API errors by ensuring client-provided coverage limits match
+ * Covercube's state-specific requirements before building the request.
  */
 export function isValidCoverageLimit(
   state: State,

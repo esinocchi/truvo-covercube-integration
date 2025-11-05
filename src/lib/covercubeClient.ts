@@ -1,14 +1,15 @@
-// src/lib/covercubeClient.ts
-
 import type { CovercubeRequest, CovercubeResponse } from "@/zod-schemas/covercube";
 import { config } from "@/config";
 
 /**
- * Sends a rate quote request to the Covercube API
- * 
- * @param payload - The complete Covercube request payload
- * @returns The parsed response from Covercube
- * @throws Error if the request fails or returns a non-200 status
+ * Sends rate quote request to Covercube API with error context preservation
+ *
+ * Isolated in a separate module to enable easy mocking in tests and maintain
+ * separation of concerns between request building and external API communication.
+ *
+ * @param payload - Validated and state-compliant Covercube request
+ * @returns Raw API response for Zod validation
+ * @throws Error with HTTP status and response text for debugging failed requests
  */
 export async function callCovercubeAPI(
   payload: CovercubeRequest

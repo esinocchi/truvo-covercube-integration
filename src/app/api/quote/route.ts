@@ -5,7 +5,6 @@ import type { QuoteInput } from "@/zod-schemas/covercube";
 import { buildCovercubeRequest } from "@/lib/buildRequest";
 import { callCovercubeAPI } from "@/lib/covercubeClient";
 import { validateCovercubeResponse } from "@/lib/validateResponse";
-import { validateQuoteInput } from "@/lib/validateInput";
 
 /**
  * POST /api/quote
@@ -26,8 +25,8 @@ import { validateQuoteInput } from "@/lib/validateInput";
 export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.json();
-    validateQuoteInput(rawBody as QuoteInput);
 
+    // Validation is handled through Zod schemas
     const covercubePayload = buildCovercubeRequest(rawBody as QuoteInput);
     const rawResponse = await callCovercubeAPI(covercubePayload);
     const validatedResponse = validateCovercubeResponse(rawResponse);

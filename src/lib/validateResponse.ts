@@ -1,18 +1,17 @@
-// src/lib/validateResponse.ts
-
 import { CovercubeResponseSchema } from "@/zod-schemas/covercube";
 import type { CovercubeResponse } from "@/zod-schemas/covercube";
 import { ZodError } from "zod";
 
 /**
- * Validates the Covercube API response structure using Zod
+ * Validates untrusted Covercube API response with Zod schema enforcement
  *
- * Ensures the response contains all required fields with correct types.
- * Uses the CovercubeResponseSchema for comprehensive validation.
+ * Prevents runtime errors from malformed API responses by validating structure
+ * before data reaches business logic. Converts Zod validation errors into
+ * actionable debugging messages with field paths and failure reasons.
  *
- * @param rawResponse - The raw response from Covercube API (unknown type)
- * @returns The validated and typed response object
- * @throws Error if required fields are missing or have invalid types
+ * @param rawResponse - Untrusted raw API response
+ * @returns Type-safe validated response
+ * @throws Error with formatted field-level validation details
  */
 export function validateCovercubeResponse(
   rawResponse: unknown
@@ -21,7 +20,6 @@ export function validateCovercubeResponse(
     return CovercubeResponseSchema.parse(rawResponse);
   } catch (e) {
     if (e instanceof ZodError) {
-      // Format Zod errors into developer-friendly messages
       const summary = e.issues.map(i => `${i.path.join(".")}: ${i.message}`).join("; ");
       throw new Error(`Invalid Covercube response: ${summary}`);
     }
