@@ -15,6 +15,8 @@ export async function callCovercubeAPI(
   payload: CovercubeRequest
 ): Promise<CovercubeResponse> {
   try {
+    console.log('Covercube payload:', JSON.stringify(payload, null, 2));
+    
     const response = await fetch(config.covercube.url, {
       method: "POST",
       headers: {
@@ -31,6 +33,8 @@ export async function callCovercubeAPI(
     }
 
     const data = await response.json();
+    console.log('Covercube response:', JSON.stringify(data, null, 2));
+    
     return data as CovercubeResponse;
   } catch (error) {
     if (error instanceof Error) {
