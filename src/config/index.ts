@@ -7,7 +7,11 @@ function getRequiredEnv(key: string): string {
     }
     return value;
   }
-  
+
+function getOptionalEnv(key: string, defaultValue = ''): string {
+  return process.env[key] || defaultValue;
+}
+
   export const config = {
     covercube: {
       url: getRequiredEnv('COVERCUBE_URL'),
@@ -16,6 +20,7 @@ function getRequiredEnv(key: string): string {
       producerCodes: {
         AZ: getRequiredEnv('COVERCUBE_PRODUCER_AZ'),
         TX: getRequiredEnv('COVERCUBE_PRODUCER_TX'),
-      }
+      },
+      mockMode: getOptionalEnv('MOCK_COVERCUBE', 'false') === 'true'
     }
   };

@@ -19,20 +19,9 @@ This project implements a single API endpoint (`/api/quote`) that:
 npm install
 ```
 
-### 2. Configure Environment Variables
+**Note:** For testing without valid API credentials, set `MOCK_COVERCUBE=true` to use mock responses instead of calling the real Covercube API.
 
-Create a `.env.local` file in the root directory:
-
-```bash
-# Covercube API Configuration
-COVERCUBE_URL=https://pi-cc-dev-th.azurewebsites.net/api/truvo/rate/action
-COVERCUBE_USERNAME=test@truvoinsurance.com
-COVERCUBE_PASSWORD=Truvo$2025
-COVERCUBE_PRODUCER_AZ=AZ1198
-COVERCUBE_PRODUCER_TX=TX1199
-```
-
-### 3. Run the Development Server
+### 2. Run the Development Server
 
 ```bash
 npm run dev
@@ -40,7 +29,7 @@ npm run dev
 
 The API will be available at `http://localhost:3000/api/quote`
 
-### 4. Run Tests
+### 3. Run Tests
 
 ```bash
 npm test                # Run tests in watch mode

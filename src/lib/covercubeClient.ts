@@ -1,11 +1,15 @@
 import type { CovercubeRequest, CovercubeResponse } from "@/zod-schemas/covercube";
 import { config } from "@/config";
+import { generateMockResponse } from "./mockCovercubeResponse";
 
 /**
  * Sends rate quote request to Covercube API with error context preservation
  *
  * Isolated in a separate module to enable easy mocking in tests and maintain
  * separation of concerns between request building and external API communication.
+ *
+ * When MOCK_COVERCUBE=true, returns realistic mock data without calling the real API.
+ * This is useful for testing the complete flow without valid API credentials.
  *
  * @param payload - Validated and state-compliant Covercube request
  * @returns Raw API response for Zod validation
@@ -14,9 +18,18 @@ import { config } from "@/config";
 export async function callCovercubeAPI(
   payload: CovercubeRequest
 ): Promise<CovercubeResponse> {
+  console.log('Covercube payload:', JSON.stringify(payload, null, 2));
+
+  // Mock mode - return test data without calling the real API
+  if (config.covercube.mockMode) {
+    console.log('[MOCK MODE] Bypassing real API call, returning mock data');
+    const mockResponse = generateMockResponse(payload);
+    console.log('Covercube response (MOCK):', JSON.stringify(mockResponse, null, 2));
+    return mockResponse;
+  }
+
+  // Real API call
   try {
-    console.log('Covercube payload:', JSON.stringify(payload, null, 2));
-    
     const response = await fetch(config.covercube.url, {
       method: "POST",
       headers: {
@@ -34,7 +47,7 @@ export async function callCovercubeAPI(
 
     const data = await response.json();
     console.log('Covercube response:', JSON.stringify(data, null, 2));
-    
+
     return data as CovercubeResponse;
   } catch (error) {
     if (error instanceof Error) {
